@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fa243c">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>iTune</title>
+<style>
+:root{--bg:#fff;--fg:#1c1c1e;--mut:#8e8e93;--line:#e5e5ea;--acc:#fa243c;--card:#f2f2f7;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#000;--fg:#f5f5f7;--mut:#98989f;--line:#2c2c2e;--card:#1c1c1e;color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.4 -apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+header{display:flex;align-items:center;gap:4px;padding:10px 12px 4px 16px}
+h1{flex:1;margin:0;font-size:32px;letter-spacing:-.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ic{background:none;border:0;color:var(--acc);width:44px;height:44px;font-size:34px;line-height:1;border-radius:50%;cursor:pointer}
+main{flex:1;overflow-y:auto;padding:0 16px 12px}
+.row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.art{width:44px;height:44px;border-radius:8px;background:var(--card);color:var(--acc);display:grid;place-items:center;flex:none;font-size:20px}
+.t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t small{display:block;color:var(--mut)}
+.on .t{color:var(--acc);font-weight:600}
+.more{background:none;border:0;color:var(--mut);font-size:22px;width:40px;height:40px;cursor:pointer}
+.bar{display:flex;gap:8px;flex-wrap:wrap;padding:8px 0 12px}
+.pill{background:var(--card);color:var(--acc);border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:600;cursor:pointer}
+.pill.x{color:var(--mut)}
+.newpl{width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);color:var(--acc);font:inherit;font-weight:600;padding:12px 0;cursor:pointer}
+#q,#ni{width:100%;padding:11px 14px;border-radius:10px;border:0;background:var(--card);color:var(--fg);font:inherit;margin:8px 0 12px}
+.empty{text-align:center;color:var(--mut);padding:56px 24px}
+.empty b{display:block;color:var(--fg);font-size:18px;margin-bottom:6px}
+#mp{display:flex;align-items:center;flex-wrap:wrap;gap:2px;padding:8px 12px 4px;background:var(--card);border-top:1px solid var(--line)}
+#mt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+#mp button{background:none;border:0;color:var(--fg);width:44px;height:40px;display:grid;place-items:center;cursor:pointer}
+#sk{width:100%;accent-color:var(--acc);margin:0 0 2px}
+nav{display:flex;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:0;color:var(--mut);padding:8px 0 6px;font:inherit;font-size:11px;display:grid;justify-items:center;gap:2px;cursor:pointer}
+nav .on{color:var(--acc)}
+svg{width:24px;height:24px;fill:currentColor}
+dialog{margin:auto auto 0;width:100%;max-width:480px;border:0;border-radius:16px 16px 0 0;background:var(--bg);color:var(--fg);padding:8px 16px calc(16px + env(safe-area-inset-bottom))}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+dialog h3{margin:8px 0;font-size:15px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+dialog button{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:14px 0;font:inherit;color:var(--fg);cursor:pointer}
+dialog .danger,dialog [data-ok]{color:var(--acc)}
+dialog [data-ok]{font-weight:600}
+.pk{max-height:50vh;overflow:auto}
+.pk label{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+#ts{position:fixed;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:20px;font-size:14px;z-index:9}
+</style></head>
+<body>
+<header>
+  <button class="ic" id="back" hidden aria-label="Back">&#8249;</button>
+  <h1 id="h">Songs</h1>
+  <button class="ic" id="add" aria-label="Add songs">+</button>
+</header>
+<main id="main"></main>
+<div id="mp" hidden>
+  <div id="mt"></div>
+  <button id="pv" aria-label="Previous"></button><button id="pp" aria-label="Play or pause"></button><button id="nx" aria-label="Next"></button>
+  <input id="sk" type="range" min="0" max="1000" value="0" aria-label="Seek">
+</div>
+<nav>
+  <button data-t="home" class="on"><svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>Home</button>
+  <button data-t="lists"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h10v2H4z"/></svg>Playlists</button>
+  <button data-t="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="2"/></svg>Search</button>
+</nav>
+<dialog id="sh"></dialog>
+<input id="f" type="file" accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.opus" multiple hidden>
+<div id="ts" hidden></div>
+<script>
+const $=s=>document.querySelector(s),esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const svg=p=>`<svg viewBox="0 0 24 24">${p}</svg>`;
+const PLAY=svg('<path d="M8 5v14l11-7z"/>'),PAUSE=svg('<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>');
+let db,songs=[],lists=[],tab='home',openList=null,q='',view=[],queue=[],qi=-1,url=null;
+const audio=new Audio(),S=id=>songs.find(s=>s.id===id),L=id=>lists.find(p=>p.id===id);
+
+function openDB(){return new Promise((ok,no)=>{const r=indexedDB.open('itune',1);
+ r.onupgradeneeded=()=>{r.result.createObjectStore('songs',{keyPath:'id',autoIncrement:true});r.result.createObjectStore('lists',{keyPath:'id',autoIncrement:true})};
+ r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+const tx=(s,m,f)=>new Promise((ok,no)=>{const t=db.transaction(s,m),r=f(t.objectStore(s));t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>no(t.error)});
+async function refresh(){songs=await tx('songs','readonly',o=>o.getAll());lists=await tx('lists','readonly',o=>o.getAll());songs.sort((a,b)=>a.name.localeCompare(b.name));render()}
+const mkpl=(n,ids=[])=>tx('lists','readwrite',o=>o.add({name:n,ids})).then(refresh);
+const savePl=(p,fn)=>{fn(p);return tx('lists','readwrite',o=>o.put(p)).then(refresh)};
+
+const empty=(t,d)=>`<div class="empty"><b>${t}</b>${d}</div>`;
+const rows=l=>l.map(s=>`<div class="row" data-play="${s.id}"><div class="art">&#9835;</div><div class="t">${esc(s.name)}</div><button class="more" data-more="${s.id}" aria-label="More options">&#8943;</button></div>`).join('');
+const pills=x=>`<div class="bar"><button class="pill" data-a="playall">Play</button><button class="pill" data-a="shuffle">Shuffle</button>${x||''}</div>`;
+
+function render(){
+ if(openList&&!L(openList))openList=null;
+ const p=openList&&L(openList);
+ $('#h').textContent=p?p.name:{home:'Songs',lists:'Playlists',search:'Search'}[tab];
+ $('#back').hidden=!p;
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
+ let h='';
+ if(p){view=p.ids.map(S).filter(Boolean);
+  h=pills('<button class="pill" data-a="pick">Add songs</button><button class="pill x" data-a="delpl">Delete</button>')+(view.length?rows(view):empty('Empty playlist','Tap Add songs to fill it.'))}
+ else if(tab==='home'){view=songs;h=songs.length?pills()+rows(songs):empty('No songs yet','Tap + at the top to add songs from your phone.')}
+ else if(tab==='lists'){h=`<button class="newpl" data-a="newpl">+ New playlist</button>`+lists.map(x=>`<div class="row" data-pl="${x.id}"><div class="art">&#9835;</div><div class="t">${esc(x.name)}<small>${x.ids.length} songs</small></div></div>`).join('')}
+ else h=`<input id="q" type="search" placeholder="Search your songs" value="${esc(q)}" autocomplete="off"><div id="res"></div>`;
+ $('#main').innerHTML=h;
+ if(!p&&tab==='search')res();
+ mark();
+}
+function res(){view=q?songs.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())):[];
+ $('#res').innerHTML=q?(rows(view)||empty('No match','Try another name.')):empty('Search','Type a song name.');mark()}
+const mark=()=>document.querySelectorAll('[data-play]').forEach(r=>r.classList.toggle('on',+r.dataset.play===queue[qi]));
+
+/* dialogs */
+const sh=$('#sh');
+function sheet(t,items){sh.innerHTML=`<h3>${esc(t)}</h3>`+items.map((x,i)=>`<button class="${x[2]?'danger':''}" data-i="${i}">${esc(x[0])}</button>`).join('');sh._items=items;sh.showModal()}
+function ask(t,cb){sh.innerHTML=`<h3>${t}</h3><input id="ni" placeholder="Playlist name" maxlength="60"><button data-ok>Create</button>`;sh._ok=()=>{const n=$('#ni').value.trim();if(n)cb(n)};sh.showModal();$('#ni').focus()}
+function pick(){const p=L(openList);
+ sh.innerHTML=`<h3>Add songs</h3><div class="pk">`+songs.map(s=>`<label><input type="checkbox" value="${s.id}" ${p.ids.includes(s.id)?'checked':''}>${esc(s.name)}</label>`).join('')+`</div><button data-ok>Done</button>`;
+ sh._ok=()=>savePl(p,x=>{x.ids=[...sh.querySelectorAll('.pk input:checked')].map(i=>+i.value)});sh.showModal()}
+sh.onclick=e=>{if(e.target===sh)return sh.close();
+ if(e.target.closest('[data-ok]')){sh.close();return sh._ok()}
+ const b=e.target.closest('button[data-i]');if(b){sh.close();sh._items[b.dataset.i][1]()}};
+function toast(m){const t=$('#ts');t.textContent=m;t.hidden=false;clearTimeout(t._t);t._t=setTimeout(()=>t.hidden=true,2200)}
+
+/* actions */
+function more(id){const items=[['Add to playlist',()=>choose(id)]];
+ if(openList)items.push(['Remove from this playlist',()=>savePl(L(openList),p=>{p.ids=p.ids.filter(x=>x!==id)})]);
+ items.push(['Delete from iTune',()=>{if(confirm('Delete this song from iTune?'))del(id)},1]);
+ sheet(S(id).name,items)}
+function choose(id){sheet('Add to playlist',[['New playlist',()=>ask('New playlist',n=>mkpl(n,[id]))],...lists.map(p=>[p.name,()=>savePl(p,x=>{if(!x.ids.includes(id))x.ids.push(id)}).then(()=>toast('Added'))])])}
+async function del(id){await tx('songs','readwrite',o=>o.delete(id));
+ for(const p of lists)if(p.ids.includes(id)){p.ids=p.ids.filter(x=>x!==id);await tx('lists','readwrite',o=>o.put(p))}
+ if(queue[qi]===id){audio.pause();audio.removeAttribute('src');queue=[];qi=-1;sync()}
+ refresh()}
+function act(a){
+ if(a==='playall'&&view.length)play(view,0);
+ if(a==='shuffle'&&view.length)play([...view].sort(()=>Math.random()-.5),0);
+ if(a==='newpl')ask('New playlist',n=>mkpl(n));
+ if(a==='pick')pick();
+ if(a==='delpl'&&confirm('Delete this playlist? Songs stay in your library.'))tx('lists','readwrite',o=>o.delete(openList)).then(()=>{openList=null;refresh()})}
+
+/* player */
+function play(list,i){queue=list.map(s=>s.id);qi=i;track()}
+function track(){const s=S(queue[qi]);if(!s)return;
+ if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(s.file);audio.src=url;audio.play().catch(()=>{});
+ if('mediaSession'in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:s.name,artist:'iTune'});
+ sync();mark()}
+function next(){if(!queue.length)return;qi=(qi+1)%queue.length;track()}
+function prev(){if(!queue.length)return;if(audio.currentTime>3)audio.currentTime=0;else{qi=(qi-1+queue.length)%queue.length;track()}}
+const toggle=()=>audio.paused?audio.play().catch(()=>{}):audio.pause();
+function sync(){const s=S(queue[qi]);$('#mp').hidden=!s;if(s)$('#mt').textContent=s.name;$('#pp').innerHTML=audio.paused?PLAY:PAUSE}
+audio.onplay=audio.onpause=sync;audio.onended=next;audio.onerror=()=>queue.length&&toast('Cannot play this file');
+audio.ontimeupdate=()=>{$('#sk').value=audio.duration?audio.currentTime/audio.duration*1000:0};
+$('#sk').oninput=e=>{if(audio.duration)audio.currentTime=e.target.value/1000*audio.duration};
+$('#pv').innerHTML=svg('<path d="M18 6l-8.5 6L18 18zM6 6h2v12H6z"/>');$('#nx').innerHTML=svg('<path d="M6 6l8.5 6L6 18zM16 6h2v12h-2z"/>');
+$('#pv').onclick=prev;$('#nx').onclick=next;$('#pp').onclick=toggle;
+if('mediaSession'in navigator)[['play',toggle],['pause',toggle],['nexttrack',next],['previoustrack',prev]].forEach(([k,f])=>{try{navigator.mediaSession.setActionHandler(k,f)}catch(e){}});
+
+/* events */
+$('#main').onclick=e=>{const t=e.target.closest('[data-more],[data-a],[data-pl],[data-play]');if(!t)return;
+ if(t.dataset.more)return more(+t.dataset.more);
+ if(t.dataset.a)return act(t.dataset.a);
+ if(t.dataset.pl){openList=+t.dataset.pl;return render()}
+ play(view,view.findIndex(s=>s.id===+t.dataset.play))};
+$('#main').oninput=e=>{if(e.target.id==='q'){q=e.target.value;res()}};
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{tab=b.dataset.t;openList=null;render()});
+$('#back').onclick=()=>{openList=null;render()};
+$('#add').onclick=()=>$('#f').click();
+$('#f').onchange=async e=>{let n=0;
+ for(const f of e.target.files){const key=f.name+f.size;if(songs.some(s=>s.key===key))continue;
+  await tx('songs','readwrite',o=>o.add({name:f.name.replace(/\.[^.]+$/,''),key,file:f}));n++;songs.push({key})}
+ e.target.value='';await refresh();toast(n?n+(n>1?' songs added':' song added'):'Already in iTune')};
+
+(async()=>{
+ if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+ try{db=await openDB();navigator.storage&&navigator.storage.persist&&navigator.storage.persist();await refresh()}
+ catch(e){$('#main').innerHTML=empty('Storage unavailable','Open iTune in a normal (not private) browser window.')}
+})();
+</script>
+</body></html>
