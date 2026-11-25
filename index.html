@@ -30,10 +30,33 @@ main{flex:1;overflow-y:auto;padding:0 16px 12px}
 #q,#ni{width:100%;padding:11px 14px;border-radius:10px;border:0;background:var(--card);color:var(--fg);font:inherit;margin:8px 0 12px}
 .empty{text-align:center;color:var(--mut);padding:56px 24px}
 .empty b{display:block;color:var(--fg);font-size:18px;margin-bottom:6px}
-#mp{display:flex;align-items:center;flex-wrap:wrap;gap:2px;padding:8px 12px 4px;background:var(--card);border-top:1px solid var(--line)}
+#mp{background:var(--card);border-top:1px solid var(--line);cursor:pointer}
+.mrow{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 12px}
+.mrow .art{width:40px;height:40px}
 #mt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
-#mp button{background:none;border:0;color:var(--fg);width:44px;height:40px;display:grid;place-items:center;cursor:pointer}
-#sk{width:100%;accent-color:var(--acc);margin:0 0 2px}
+.mrow button{background:none;border:0;color:var(--fg);width:44px;height:44px;display:grid;place-items:center;cursor:pointer}
+#mb{height:2px;background:var(--line)}#mb i{display:block;height:100%;width:0;background:var(--acc)}
+#np{position:fixed;inset:0;z-index:5;background:var(--bg);display:flex;flex-direction:column;justify-content:space-between;align-items:center;gap:8px;padding:env(safe-area-inset-top) 24px calc(16px + env(safe-area-inset-bottom));visibility:hidden;transform:translateY(100%);transition:transform .3s,visibility 0s .3s;overflow:hidden}
+#np.open{visibility:visible;transform:none;transition:transform .3s}
+#np>*{width:100%;max-width:400px}
+#npart{align-self:center;width:min(100%,40vh);aspect-ratio:1;border-radius:14px;background:linear-gradient(135deg,#ff5a6e,#fa243c 55%,#b3122a);color:#fff;display:grid;place-items:center;font-size:min(30vw,20vh);box-shadow:0 20px 40px rgba(250,36,60,.3);transition:transform .35s}
+#npart.paused{transform:scale(.86)}
+.nptt{display:flex;align-items:center;gap:8px}
+.nptt>div{flex:1;min-width:0}
+#npt{font-size:22px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nptt small{color:var(--mut);font-size:16px}
+.nptt .ic{width:36px;height:36px;font-size:22px;background:var(--card);color:var(--fg)}
+#sk{width:100%;accent-color:var(--acc);margin:0}
+.tm{display:flex;justify-content:space-between;color:var(--mut);font-size:12px;font-variant-numeric:tabular-nums}
+.ctl{display:flex;justify-content:center;align-items:center;gap:24px}
+.ctl button{background:none;border:0;color:var(--fg);width:64px;height:64px;display:grid;place-items:center;cursor:pointer}
+.ctl .pp svg{width:48px;height:48px}.ctl .pv svg,.ctl .nx svg{width:36px;height:36px}
+.vol{display:flex;align-items:center;gap:10px;color:var(--mut)}
+.vol input{flex:1;accent-color:var(--acc)}.vol svg{width:18px;height:18px}
+.ctl2{display:flex;justify-content:center;gap:56px}
+.ctl2 button{background:none;border:0;color:var(--mut);width:48px;height:48px;border-radius:12px;display:grid;place-items:center;cursor:pointer}
+.ctl2 .act{color:var(--acc);background:var(--card)}
+@media(prefers-reduced-motion:reduce){#np,#npart{transition:none}}
 nav{display:flex;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
 nav button{flex:1;background:none;border:0;color:var(--mut);padding:8px 0 6px;font:inherit;font-size:11px;display:grid;justify-items:center;gap:2px;cursor:pointer}
 nav .on{color:var(--acc)}
@@ -56,9 +79,17 @@ dialog [data-ok]{font-weight:600}
 </header>
 <main id="main"></main>
 <div id="mp" hidden>
-  <div id="mt"></div>
-  <button id="pv" aria-label="Previous"></button><button id="pp" aria-label="Play or pause"></button><button id="nx" aria-label="Next"></button>
-  <input id="sk" type="range" min="0" max="1000" value="0" aria-label="Seek">
+  <div class="mrow"><div class="art">&#9835;</div><div id="mt"></div><button class="pp" aria-label="Play or pause"></button><button class="nx" aria-label="Next"></button></div>
+  <div id="mb"><i></i></div>
+</div>
+<div id="np">
+  <div class="nph"><button class="ic" id="npc" aria-label="Close player"></button></div>
+  <div id="npart" class="paused">&#9835;</div>
+  <div class="nptt"><div><div id="npt"></div><small>iTune</small></div><button class="ic" id="npm" aria-label="More options">&#8943;</button></div>
+  <div><input id="sk" type="range" min="0" max="1000" value="0" aria-label="Seek"><div class="tm"><span id="te">0:00</span><span id="tr">-0:00</span></div></div>
+  <div class="ctl"><button class="pv" aria-label="Previous"></button><button class="pp" aria-label="Play or pause"></button><button class="nx" aria-label="Next"></button></div>
+  <div class="vol"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9z"/></svg><input id="vl" type="range" min="0" max="100" value="100" aria-label="Volume"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9z"/><path d="M15 8a5 5 0 0 1 0 8M17.5 5a9 9 0 0 1 0 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+  <div class="ctl2"><button id="shb" aria-label="Shuffle"></button><button id="rpb" aria-label="Repeat"></button></div>
 </div>
 <nav>
   <button data-t="home" class="on"><svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg>Home</button>
@@ -72,14 +103,14 @@ dialog [data-ok]{font-weight:600}
 const $=s=>document.querySelector(s),esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const svg=p=>`<svg viewBox="0 0 24 24">${p}</svg>`;
 const PLAY=svg('<path d="M8 5v14l11-7z"/>'),PAUSE=svg('<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>');
-let db,songs=[],lists=[],tab='home',openList=null,q='',view=[],queue=[],qi=-1,url=null;
+let db,songs=[],lists=[],tab='home',openList=null,q='',view=[],queue=[],base=[],qi=-1,url=null,rep=0,isShuf=false,seeking=false;
 const audio=new Audio(),S=id=>songs.find(s=>s.id===id),L=id=>lists.find(p=>p.id===id);
 
 function openDB(){return new Promise((ok,no)=>{const r=indexedDB.open('itune',1);
  r.onupgradeneeded=()=>{r.result.createObjectStore('songs',{keyPath:'id',autoIncrement:true});r.result.createObjectStore('lists',{keyPath:'id',autoIncrement:true})};
  r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
 const tx=(s,m,f)=>new Promise((ok,no)=>{const t=db.transaction(s,m),r=f(t.objectStore(s));t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>no(t.error)});
-async function refresh(){songs=await tx('songs','readonly',o=>o.getAll());lists=await tx('lists','readonly',o=>o.getAll());songs.sort((a,b)=>a.name.localeCompare(b.name));render()}
+async function refresh(){songs=await tx('songs','readonly',o=>o.getAll());lists=await tx('lists','readonly',o=>o.getAll());songs.sort((a,b)=>a.name.localeCompare(b.name));render();sync()}
 const mkpl=(n,ids=[])=>tx('lists','readwrite',o=>o.add({name:n,ids})).then(refresh);
 const savePl=(p,fn)=>{fn(p);return tx('lists','readwrite',o=>o.put(p)).then(refresh)};
 
@@ -95,7 +126,7 @@ function render(){
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
  let h='';
  if(p){view=p.ids.map(S).filter(Boolean);
-  h=pills('<button class="pill" data-a="pick">Add songs</button><button class="pill x" data-a="delpl">Delete</button>')+(view.length?rows(view):empty('Empty playlist','Tap Add songs to fill it.'))}
+  h=pills('<button class="pill" data-a="pick">Add songs</button><button class="pill" data-a="renpl">Rename</button><button class="pill x" data-a="delpl">Delete</button>')+(view.length?rows(view):empty('Empty playlist','Tap Add songs to fill it.'))}
  else if(tab==='home'){view=songs;h=songs.length?pills()+rows(songs):empty('No songs yet','Tap + at the top to add songs from your phone.')}
  else if(tab==='lists'){h=`<button class="newpl" data-a="newpl">+ New playlist</button>`+lists.map(x=>`<div class="row" data-pl="${x.id}"><div class="art">&#9835;</div><div class="t">${esc(x.name)}<small>${x.ids.length} songs</small></div></div>`).join('')}
  else h=`<input id="q" type="search" placeholder="Search your songs" value="${esc(q)}" autocomplete="off"><div id="res"></div>`;
@@ -110,7 +141,8 @@ const mark=()=>document.querySelectorAll('[data-play]').forEach(r=>r.classList.t
 /* dialogs */
 const sh=$('#sh');
 function sheet(t,items){sh.innerHTML=`<h3>${esc(t)}</h3>`+items.map((x,i)=>`<button class="${x[2]?'danger':''}" data-i="${i}">${esc(x[0])}</button>`).join('');sh._items=items;sh.showModal()}
-function ask(t,cb){sh.innerHTML=`<h3>${t}</h3><input id="ni" placeholder="Playlist name" maxlength="60"><button data-ok>Create</button>`;sh._ok=()=>{const n=$('#ni').value.trim();if(n)cb(n)};sh.showModal();$('#ni').focus()}
+function ask(t,cb,v='',ph='Playlist name',b='Create'){sh.innerHTML=`<h3>${t}</h3><input id="ni" placeholder="${ph}" maxlength="80" value="${esc(v)}"><button data-ok>${b}</button>`;sh._ok=()=>{const n=$('#ni').value.trim();if(n)cb(n)};sh.showModal();$('#ni').select()}
+sh.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='ni')sh.querySelector('[data-ok]').click()});
 function pick(){const p=L(openList);
  sh.innerHTML=`<h3>Add songs</h3><div class="pk">`+songs.map(s=>`<label><input type="checkbox" value="${s.id}" ${p.ids.includes(s.id)?'checked':''}>${esc(s.name)}</label>`).join('')+`</div><button data-ok>Done</button>`;
  sh._ok=()=>savePl(p,x=>{x.ids=[...sh.querySelectorAll('.pk input:checked')].map(i=>+i.value)});sh.showModal()}
@@ -120,38 +152,72 @@ sh.onclick=e=>{if(e.target===sh)return sh.close();
 function toast(m){const t=$('#ts');t.textContent=m;t.hidden=false;clearTimeout(t._t);t._t=setTimeout(()=>t.hidden=true,2200)}
 
 /* actions */
-function more(id){const items=[['Add to playlist',()=>choose(id)]];
+function more(id){const items=[['Add to playlist',()=>choose(id)],['Rename',()=>renameSong(id)]];
  if(openList)items.push(['Remove from this playlist',()=>savePl(L(openList),p=>{p.ids=p.ids.filter(x=>x!==id)})]);
  items.push(['Delete from iTune',()=>{if(confirm('Delete this song from iTune?'))del(id)},1]);
  sheet(S(id).name,items)}
 function choose(id){sheet('Add to playlist',[['New playlist',()=>ask('New playlist',n=>mkpl(n,[id]))],...lists.map(p=>[p.name,()=>savePl(p,x=>{if(!x.ids.includes(id))x.ids.push(id)}).then(()=>toast('Added'))])])}
 async function del(id){await tx('songs','readwrite',o=>o.delete(id));
  for(const p of lists)if(p.ids.includes(id)){p.ids=p.ids.filter(x=>x!==id);await tx('lists','readwrite',o=>o.put(p))}
- if(queue[qi]===id){audio.pause();audio.removeAttribute('src');queue=[];qi=-1;sync()}
+ if(queue.includes(id)){const cur=queue[qi];queue=queue.filter(x=>x!==id);base=base.filter(x=>x!==id);if(cur===id){audio.pause();audio.removeAttribute('src');queue=[];base=[];qi=-1}else qi=queue.indexOf(cur)}
  refresh()}
 function act(a){
- if(a==='playall'&&view.length)play(view,0);
- if(a==='shuffle'&&view.length)play([...view].sort(()=>Math.random()-.5),0);
+ if(a==='playall'&&view.length){isShuf=false;play(view,0)}
+ if(a==='shuffle'&&view.length){isShuf=true;play(view,Math.random()*view.length|0)}
  if(a==='newpl')ask('New playlist',n=>mkpl(n));
  if(a==='pick')pick();
+ if(a==='renpl')ask('Rename playlist',n=>savePl(L(openList),p=>{p.name=n}),L(openList).name,'Playlist name','Save');
  if(a==='delpl'&&confirm('Delete this playlist? Songs stay in your library.'))tx('lists','readwrite',o=>o.delete(openList)).then(()=>{openList=null;refresh()})}
 
 /* player */
-function play(list,i){queue=list.map(s=>s.id);qi=i;track()}
+const mix=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const fmt=t=>isFinite(t)?Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0'):'0:00';
+const ico=(p,x='')=>svg(`<path d="${p}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>${x}`);
+const PV=svg('<path d="M18 6l-8.5 6L18 18zM6 6h2v12H6z"/>'),NX=svg('<path d="M6 6l8.5 6L6 18zM16 6h2v12h-2z"/>');
+const SHUF=ico('M3 7h3c3 0 5 2 7 5s4 5 7 5h1M3 17h3c1.5 0 2.8-.6 4-1.8M14 8c1.2-1.2 2.5-1.8 4-1.8h2M19 3l3 3-3 3M19 14l3 3-3 3');
+const RD='M4 11V9a3 3 0 0 1 3-3h12M16 3l3 3-3 3M20 13v2a3 3 0 0 1-3 3H5M8 21l-3-3 3-3';
+const REP=ico(RD),REP1=ico(RD,'<text x="12" y="15" font-size="8" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none">1</text>');
+const sk=$('#sk');
+function renameSong(id){const s=S(id);ask('Rename song',n=>{s.name=n;tx('songs','readwrite',o=>o.put(s)).then(refresh)},s.name,'Song name','Save')}
+function play(list,i){base=list.map(s=>s.id);const id=base[i];queue=isShuf?[id,...mix(base.filter(x=>x!==id))]:[...base];qi=queue.indexOf(id);track()}
 function track(){const s=S(queue[qi]);if(!s)return;
  if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(s.file);audio.src=url;audio.play().catch(()=>{});
  if('mediaSession'in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:s.name,artist:'iTune'});
  sync();mark()}
-function next(){if(!queue.length)return;qi=(qi+1)%queue.length;track()}
+function next(auto){if(!queue.length)return;
+ if(auto&&rep===2){audio.currentTime=0;audio.play();return}
+ if(qi<queue.length-1)qi++;
+ else if(auto&&rep===0){audio.pause();return}
+ else qi=0;
+ track()}
 function prev(){if(!queue.length)return;if(audio.currentTime>3)audio.currentTime=0;else{qi=(qi-1+queue.length)%queue.length;track()}}
+function shuf(){isShuf=!isShuf;if(queue.length){const id=queue[qi];queue=isShuf?[id,...mix(queue.filter(x=>x!==id))]:base.filter(x=>queue.includes(x));qi=queue.indexOf(id)}sync()}
 const toggle=()=>audio.paused?audio.play().catch(()=>{}):audio.pause();
-function sync(){const s=S(queue[qi]);$('#mp').hidden=!s;if(s)$('#mt').textContent=s.name;$('#pp').innerHTML=audio.paused?PLAY:PAUSE}
-audio.onplay=audio.onpause=sync;audio.onended=next;audio.onerror=()=>queue.length&&toast('Cannot play this file');
-audio.ontimeupdate=()=>{$('#sk').value=audio.duration?audio.currentTime/audio.duration*1000:0};
-$('#sk').oninput=e=>{if(audio.duration)audio.currentTime=e.target.value/1000*audio.duration};
-$('#pv').innerHTML=svg('<path d="M18 6l-8.5 6L18 18zM6 6h2v12H6z"/>');$('#nx').innerHTML=svg('<path d="M6 6l8.5 6L6 18zM16 6h2v12h-2z"/>');
-$('#pv').onclick=prev;$('#nx').onclick=next;$('#pp').onclick=toggle;
-if('mediaSession'in navigator)[['play',toggle],['pause',toggle],['nexttrack',next],['previoustrack',prev]].forEach(([k,f])=>{try{navigator.mediaSession.setActionHandler(k,f)}catch(e){}});
+function sync(){const s=S(queue[qi]);$('#mp').hidden=!s;
+ if(s){$('#mt').textContent=s.name;$('#npt').textContent=s.name}else $('#np').classList.remove('open');
+ document.querySelectorAll('.pp').forEach(b=>b.innerHTML=audio.paused?PLAY:PAUSE);
+ $('#npart').classList.toggle('paused',audio.paused);
+ $('#shb').innerHTML=SHUF;$('#shb').classList.toggle('act',isShuf);
+ $('#rpb').innerHTML=rep===2?REP1:REP;$('#rpb').classList.toggle('act',rep>0)}
+audio.onplay=audio.onpause=sync;audio.onended=()=>next(true);audio.onerror=()=>queue.length&&toast('Cannot play this file');
+audio.ontimeupdate=()=>{const d=audio.duration,t=audio.currentTime;
+ if(d){$('#mb i').style.width=t/d*100+'%';$('#tr').textContent='-'+fmt(d-t);if(!seeking)sk.value=t/d*1000;
+  if('mediaSession'in navigator)try{navigator.mediaSession.setPositionState({duration:d,position:t,playbackRate:1})}catch(e){}}
+ if(!seeking)$('#te').textContent=fmt(t)};
+audio.onloadedmetadata=()=>audio.ontimeupdate();
+sk.onpointerdown=()=>seeking=true;sk.onpointerup=sk.onpointercancel=sk.onchange=()=>seeking=false;
+sk.oninput=()=>{const d=audio.duration;if(d){audio.currentTime=sk.value/1000*d;$('#te').textContent=fmt(audio.currentTime)}};
+$('#vl').oninput=e=>{audio.volume=e.target.value/100};
+document.querySelectorAll('.pv').forEach(b=>{b.innerHTML=PV;b.onclick=prev});
+document.querySelectorAll('.nx').forEach(b=>{b.innerHTML=NX;b.onclick=()=>next()});
+document.querySelectorAll('.pp').forEach(b=>b.onclick=toggle);
+$('#shb').onclick=()=>{shuf();toast(isShuf?'Shuffle on':'Shuffle off')};
+$('#rpb').onclick=()=>{rep=(rep+1)%3;sync();toast(['Repeat off','Repeat all','Repeat one'][rep])};
+$('#npc').innerHTML=ico('M5 9l7 7 7-7');
+$('#npc').onclick=()=>$('#np').classList.remove('open');
+$('#npm').onclick=()=>{if(queue.length)more(queue[qi])};
+$('#mp').onclick=e=>{if(!e.target.closest('button'))$('#np').classList.add('open')};
+if('mediaSession'in navigator)[['play',toggle],['pause',toggle],['nexttrack',()=>next()],['previoustrack',prev],['seekto',d=>{audio.currentTime=d.seekTime}]].forEach(([k,f])=>{try{navigator.mediaSession.setActionHandler(k,f)}catch(e){}});
 
 /* events */
 $('#main').onclick=e=>{const t=e.target.closest('[data-more],[data-a],[data-pl],[data-play]');if(!t)return;
